@@ -14,10 +14,6 @@ class PrivateBrowsing {
     // On startup we are no longer in private mode, if there is a .public cookies file, it means app was killed in private mode, so restore the cookies file
     func startupCheckIfKilledWhileInPBMode() {
         webkitDirLocker(lock: false)
-
-        CacheClearable().clear()
-        CookiesClearable().clear()
-
         cookiesFileDiskOperation(.Restore)
     }
 

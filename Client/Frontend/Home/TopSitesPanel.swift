@@ -130,16 +130,6 @@ class TopSitesPanel: UIViewController {
         let overlayView = UIView()
         overlayView.backgroundColor = UIColor.whiteColor()
 
-        let logoImageView = UIImageView(image: UIImage(named: "emptyTopSites"))
-        overlayView.addSubview(logoImageView)
-
-        let titleLabel = UILabel()
-        titleLabel.font = DynamicFontHelper.defaultHelper.DeviceFont
-        titleLabel.text = Strings.TopSitesEmptyStateTitle
-        titleLabel.textAlignment = NSTextAlignment.Center
-        titleLabel.textColor = TopSitesPanelUX.EmptyStateTitleTextColor
-        overlayView.addSubview(titleLabel)
-
         let descriptionLabel = UILabel()
         descriptionLabel.text = Strings.TopSitesEmptyStateDescription
         descriptionLabel.textAlignment = NSTextAlignment.Center
@@ -149,24 +139,8 @@ class TopSitesPanel: UIViewController {
         descriptionLabel.adjustsFontSizeToFitWidth = true
         overlayView.addSubview(descriptionLabel)
 
-        logoImageView.snp_makeConstraints { make in
-            make.centerX.equalTo(overlayView)
-
-            // Sets proper top constraint for iPhone 6 in portait and for iPad.
-            make.centerY.equalTo(overlayView).offset(HomePanelUX.EmptyTabContentOffset).priorityMedium()
-
-            // Sets proper top constraint for iPhone 4, 5 in portrait.
-            make.top.greaterThanOrEqualTo(overlayView).offset(50)
-        }
-
-        titleLabel.snp_makeConstraints { make in
-            make.top.equalTo(logoImageView.snp_bottom).offset(TopSitesPanelUX.EmptyStateTopPaddingInBetweenItems)
-            make.centerX.equalTo(logoImageView)
-        }
-
         descriptionLabel.snp_makeConstraints { make in
-            make.centerX.equalTo(overlayView)
-            make.top.equalTo(titleLabel.snp_bottom).offset(TopSitesPanelUX.WelcomeScreenPadding)
+            make.center.equalTo(overlayView)
             make.width.equalTo(TopSitesPanelUX.WelcomeScreenItemWidth)
         }
 

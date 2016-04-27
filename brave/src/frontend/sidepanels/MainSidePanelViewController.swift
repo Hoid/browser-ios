@@ -16,7 +16,6 @@ class MainSidePanelViewController : SidePanelBaseViewController {
     let topButtonsView = UIView()
     let addBookmarkButton = UIButton()
 
-    //let triangleViewContainer = UIView()
     let triangleView = UIImageView()
 
     let tabTitleViewContainer = UIView()

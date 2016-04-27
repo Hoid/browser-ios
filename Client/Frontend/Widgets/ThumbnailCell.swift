@@ -71,7 +71,7 @@ struct ThumbnailCellUX {
 
     // Make the remove button look 20x20 in size but have the clickable area be 44x44
     static let RemoveButtonSize: CGFloat = 44
-    static let RemoveButtonInsets = UIEdgeInsets(top: 11, left: 11, bottom: 11, right: 11)
+    static let RemoveButtonInsets = UIEdgeInsets(top: 11, left: 0, bottom: 11, right: 22)
     static let RemoveButtonAnimationDuration: NSTimeInterval = 0.4
     static let RemoveButtonAnimationDamping: CGFloat = 0.6
 

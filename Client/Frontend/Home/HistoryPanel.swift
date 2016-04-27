@@ -190,32 +190,32 @@ class HistoryPanel: SiteTableViewController, HomePanel {
         let overlayView = UIView()
         overlayView.backgroundColor = UIColor.whiteColor()
 
-        let logoImageView = UIImageView(image: UIImage(named: "emptyHistory"))
-        overlayView.addSubview(logoImageView)
-        logoImageView.snp_makeConstraints { make in
-            make.centerX.equalTo(overlayView)
-
-            // Sets proper top constraint for iPhone 6 in portait and for iPad.
-            make.centerY.equalTo(overlayView.snp_centerY).offset(HomePanelUX.EmptyTabContentOffset).priorityMedium()
-
-            // Sets proper top constraint for iPhone 4, 5 in portrait.
-            make.top.greaterThanOrEqualTo(overlayView.snp_top).offset(50).priorityHigh()
-        }
-
-        let welcomeLabel = UILabel()
-        overlayView.addSubview(welcomeLabel)
-        welcomeLabel.text = NSLocalizedString("Pages you have visited recently will show up here.", comment: "See http://bit.ly/1I7Do4b")
-        welcomeLabel.textAlignment = NSTextAlignment.Center
-        welcomeLabel.font = DynamicFontHelper.defaultHelper.DeviceFontLight
-        welcomeLabel.textColor = HistoryPanelUX.WelcomeScreenItemTextColor
-        welcomeLabel.numberOfLines = 0
-        welcomeLabel.adjustsFontSizeToFitWidth = true
-
-        welcomeLabel.snp_makeConstraints { make in
-            make.centerX.equalTo(overlayView)
-            make.top.equalTo(logoImageView.snp_bottom).offset(HistoryPanelUX.WelcomeScreenPadding)
-            make.width.equalTo(HistoryPanelUX.WelcomeScreenItemWidth)
-        }
+//        let logoImageView = UIImageView(image: UIImage(named: "emptyHistory"))
+//        overlayView.addSubview(logoImageView)
+//        logoImageView.snp_makeConstraints { make in
+//            make.centerX.equalTo(overlayView)
+//
+//            // Sets proper top constraint for iPhone 6 in portait and for iPad.
+//            make.centerY.equalTo(overlayView.snp_centerY).offset(HomePanelUX.EmptyTabContentOffset).priorityMedium()
+//
+//            // Sets proper top constraint for iPhone 4, 5 in portrait.
+//            make.top.greaterThanOrEqualTo(overlayView.snp_top).offset(50).priorityHigh()
+//        }
+//
+//        let welcomeLabel = UILabel()
+//        overlayView.addSubview(welcomeLabel)
+//        welcomeLabel.text = NSLocalizedString("Pages you have visited recently will show up here.", comment: "See http://bit.ly/1I7Do4b")
+//        welcomeLabel.textAlignment = NSTextAlignment.Center
+//        welcomeLabel.font = DynamicFontHelper.defaultHelper.DeviceFontLight
+//        welcomeLabel.textColor = HistoryPanelUX.WelcomeScreenItemTextColor
+//        welcomeLabel.numberOfLines = 0
+//        welcomeLabel.adjustsFontSizeToFitWidth = true
+//
+//        welcomeLabel.snp_makeConstraints { make in
+//            make.centerX.equalTo(overlayView)
+//            make.top.equalTo(logoImageView.snp_bottom).offset(HistoryPanelUX.WelcomeScreenPadding)
+//            make.width.equalTo(HistoryPanelUX.WelcomeScreenItemWidth)
+//        }
 
         return overlayView
     }

@@ -38,6 +38,10 @@ class PicklistSettingOptionsView: UITableViewController {
         return cell
     }
 
+    override func tableView(tableView: UITableView, titleForFooterInSection section: Int) -> String? {
+        return "Show a prompt to open your password manager when the current page has a login form."
+    }
+
     override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         return headerTitle
     }
@@ -83,7 +87,7 @@ class PicklistSettingMainItem<T>: Setting, PicklistSettingOptionsViewDelegate {
         let prefs = profile.prefs
         let currentId = prefs.intForKey(prefName) ?? 0
         let option = lookupOptionById(Int(currentId))
-        return NSAttributedString(string: option?.item().displayName ?? "")
+        return NSAttributedString(string: option?.item().displayName ?? "", attributes: [ NSFontAttributeName: UIFont.systemFontOfSize(13)])
     }
 
     func lookupOptionById(id: Int) -> Choice<T>? {

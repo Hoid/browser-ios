@@ -74,7 +74,7 @@ public class WebViewProgress
     func setProgress(progress: Double) {
         if (progress > webView?.estimatedProgress || progress == 0 || progress > 0.99) {
             webView?.estimatedProgress = progress;
-            webView?.kvoBroadcast()
+            webView?.kvoBroadcast([KVOStrings.kvoEstimatedProgress])
         }
     }
 

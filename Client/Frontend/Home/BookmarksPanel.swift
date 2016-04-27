@@ -100,33 +100,33 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
         let overlayView = UIView()
         overlayView.backgroundColor = UIColor.whiteColor()
 
-        let logoImageView = UIImageView(image: UIImage(named: "emptyBookmarks"))
-        overlayView.addSubview(logoImageView)
-        logoImageView.snp_makeConstraints { make in
-            make.centerX.equalTo(overlayView)
+//        let logoImageView = UIImageView(image: UIImage(named: "emptyBookmarks"))
+//        overlayView.addSubview(logoImageView)
+//        logoImageView.snp_makeConstraints { make in
+//            make.centerX.equalTo(overlayView)
+//
+//            // Sets proper top constraint for iPhone 6 in portait and for iPad.
+//            make.centerY.equalTo(overlayView).offset(HomePanelUX.EmptyTabContentOffset).priorityMedium()
+//
+//            // Sets proper top constraint for iPhone 4, 5 in portrait.
+//            make.top.greaterThanOrEqualTo(overlayView).offset(50)
+//        }
+//
+//        let welcomeLabel = UILabel()
+//        overlayView.addSubview(welcomeLabel)
+//        welcomeLabel.text = emptyBookmarksText
+//        welcomeLabel.textAlignment = NSTextAlignment.Center
+//        welcomeLabel.font = DynamicFontHelper.defaultHelper.DeviceFontLight
+//        welcomeLabel.textColor = BookmarksPanelUX.WelcomeScreenItemTextColor
+//        welcomeLabel.numberOfLines = 0
+//        welcomeLabel.adjustsFontSizeToFitWidth = true
+//
+//        welcomeLabel.snp_makeConstraints { make in
+//            make.centerX.equalTo(overlayView)
+//            make.top.equalTo(logoImageView.snp_bottom).offset(BookmarksPanelUX.WelcomeScreenPadding)
+//            make.width.equalTo(BookmarksPanelUX.WelcomeScreenItemWidth)
+//        }
 
-            // Sets proper top constraint for iPhone 6 in portait and for iPad.
-            make.centerY.equalTo(overlayView).offset(HomePanelUX.EmptyTabContentOffset).priorityMedium()
-
-            // Sets proper top constraint for iPhone 4, 5 in portrait.
-            make.top.greaterThanOrEqualTo(overlayView).offset(50)
-        }
-
-        let welcomeLabel = UILabel()
-        overlayView.addSubview(welcomeLabel)
-        welcomeLabel.text = emptyBookmarksText
-        welcomeLabel.textAlignment = NSTextAlignment.Center
-        welcomeLabel.font = DynamicFontHelper.defaultHelper.DeviceFontLight
-        welcomeLabel.textColor = BookmarksPanelUX.WelcomeScreenItemTextColor
-        welcomeLabel.numberOfLines = 0
-        welcomeLabel.adjustsFontSizeToFitWidth = true
-
-        welcomeLabel.snp_makeConstraints { make in
-            make.centerX.equalTo(overlayView)
-            make.top.equalTo(logoImageView.snp_bottom).offset(BookmarksPanelUX.WelcomeScreenPadding)
-            make.width.equalTo(BookmarksPanelUX.WelcomeScreenItemWidth)
-        }
-        
         return overlayView
     }
 

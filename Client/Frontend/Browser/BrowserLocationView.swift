@@ -148,7 +148,7 @@ class BrowserLocationView: UIView {
     }()
 
     // Prefixing with brave to distinguish from progress view that firefox has (which we hide)
-    var braveProgressView: UIView = UIView(frame: CGRectMake(0, 0, 0, CGFloat(URLBarViewUX.LocationHeight - 1)))
+    var braveProgressView: UIView = UIView(frame: CGRectMake(0, 0, 0, CGFloat(URLBarViewUX.LocationHeight)))
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -283,6 +283,9 @@ class BrowserLocationView: UIView {
         } else {
             // If we're unable to highlight the domain, just use the URL as is.
             urlTextField.text = url?.absoluteString
+        }
+        delay(0.1) {
+            self.urlTextField.textColor = UIColor.whiteColor()
         }
     }
 }

@@ -10,16 +10,16 @@ fabric_keys = []
 system('cd ..; rm -rf Client.xcodeproj; tar xzf Client.xcodeproj.tgz')
 begin
   fabric_keys = File.readlines(File.expand_path('~/.brave-fabric-keys'))
-  system("sed -e 's/FABRIC_KEY_REMOVED/" + fabric_keys[0].strip + "/' ../Client/Info.plist.template > ../Client/Info.plist")
+  system("sed -e 's/FABRIC_KEY_REMOVED/" + fabric_keys[0].strip + "/' BraveInfo.plist.template > BraveInfo.plist")
   system("> xcconfig/.fabric-override.xcconfig")
 rescue SystemCallError
   puts 'No Fabric'
-  system("\\cp -f ../Client/Info.plist.template ../Client/Info.plist")
+  system("\\cp -f BraveInfo.plist.template BraveInfo.plist")
   system("echo 'OTHER_SWIFT_FLAGS = -DBRAVE -DDEBUG -DNO_FABRIC' > xcconfig/.fabric-override.xcconfig")
 end
 
 bundle_id = File.readlines('xcconfig/.bundle-id.xcconfig')[0].strip.delete(' ').delete('CUSTOM_BUNDLE_ID=')
-system("sed -i '' -e 's/BUNDLE-ID-PLACEHOLDER/" + bundle_id + "/' ../Client/Info.plist")
+system("sed -i '' -e 's/BUNDLE-ID-PLACEHOLDER/" + bundle_id + "/' BraveInfo.plist")
 
 # Open the existing Xcode project
 project_file = '../Client.xcodeproj'
@@ -53,7 +53,7 @@ def walk(proj, base, start, override_target = nil)
     else
       folder = folder.gsub('./','')
       file_ref = proj[folder].new_file(path)
-      if path =~ /(\.js)|(\.html)|(\.txt)/
+      if path =~ /(\.js)|(\.html)|(\.txt)|(\.xib)/
         $client_resources.push(file_ref)
       else
         path = path.sub('./', '')
@@ -90,6 +90,7 @@ Dir.chdir('..')
 
 brave = project.new_group('brave')
 entitlements = brave.new_file('brave/Brave.entitlements')
+brave.new_file('brave/BraveInfo.plist')
 $client_resources.push(entitlements)
 
 $target_hash['BraveShareTo']['target'].add_resources([entitlements])

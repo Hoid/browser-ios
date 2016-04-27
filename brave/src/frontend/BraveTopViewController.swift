@@ -174,10 +174,12 @@ class BraveTopViewController : UIViewController {
     }
 
     func togglePanel(panel: SidePanelBaseViewController) {
-        leftSidePanelButtonAndUnderlay?.selected = panel.view.hidden
-        leftSidePanelButtonAndUnderlay?.underlay.hidden = !panel.view.hidden
+        let willShow = panel.view.hidden
+        leftSidePanelButtonAndUnderlay?.selected = willShow
+        leftSidePanelButtonAndUnderlay?.hideUnderlay(!willShow)
+
         clickDetectionView.removeFromSuperview()
-        if UIDevice.currentDevice().userInterfaceIdiom == .Phone && panel.view.hidden {
+        if UIDevice.currentDevice().userInterfaceIdiom == .Phone && willShow {
             view.addSubview(clickDetectionView)
             clickDetectionView.snp_remakeConstraints {
                 make in
@@ -186,13 +188,11 @@ class BraveTopViewController : UIViewController {
             clickDetectionView.layoutIfNeeded()
         }
         panel.setHomePanelDelegate(self)
-        panel.showPanel(panel.view.hidden, parentSideConstraints: [leftConstraint, rightConstraint])
+        panel.showPanel(willShow, parentSideConstraints: [leftConstraint, rightConstraint])
     }
 
     func updateBookmarkStatus(isBookmarked: Bool) {
         mainSidePanel.updateBookmarkStatus(isBookmarked)
-        let bar = browserViewController.urlBar as? BraveURLBarView
-        bar?.updateBookmarkStatus(isBookmarked)
     }
 }
 

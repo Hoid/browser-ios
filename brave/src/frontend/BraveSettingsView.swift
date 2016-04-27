@@ -77,6 +77,7 @@ class BraveSettingsView : AppSettingsTableViewController {
             BoolSetting(prefs: prefs, prefKey: "saveLogins", defaultValue: true,
                 titleText: NSLocalizedString("Save Logins", comment: "Setting to enable the built-in password manager"))
 
+
             //            BoolSetting(prefs: prefs, prefKey: "blockPopups", defaultValue: true,
             //                titleText: NSLocalizedString("Block Pop-up Windows", comment: "Block pop-up windows setting")),
         ]
@@ -124,6 +125,7 @@ class BraveSettingsView : AppSettingsTableViewController {
         settings += [
             SettingSection(title: NSAttributedString(string: NSLocalizedString("Support", comment: "Support section title")), children: [
                 ShowIntroductionSetting(settings: self),
+                BraveSupportLinkSetting(),
                 BravePrivacyPolicySetting(), BraveTermsOfUseSetting(),
                 ])]
         //#endif
@@ -172,12 +174,16 @@ class ThirdPartyPasswordManagerSetting: PicklistSettingMainItem<String> {
     }
 
     init(profile: Profile) {
-        super.init(profile: profile, displayName: "3rd-party password manager", prefName: ThirdPartyPasswordManagerSetting._prefName, options: ThirdPartyPasswordManagerSetting._options)
+        super.init(profile: profile, displayName: "", prefName: ThirdPartyPasswordManagerSetting._prefName, options: ThirdPartyPasswordManagerSetting._options)
     }
 
     override func picklistSetting(setting: PicklistSettingOptionsView, pickedOptionId: Int) {
         super.picklistSetting(setting, pickedOptionId: pickedOptionId)
         ThirdPartyPasswordManagerSetting.setupOnAppStart()
+    }
+
+    override var title: NSAttributedString? {
+        return NSAttributedString(string: NSLocalizedString("3rd-party password manager", comment: "Setting to enable the built-in password manager"), attributes: [NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor, NSFontAttributeName: UIFont.systemFontOfSize(14)])
     }
 }
 
@@ -237,6 +243,17 @@ class PasswordsClearable: Clearable {
             }
             return succeed()
         }
+    }
+}
+
+class BraveSupportLinkSetting: Setting{
+    override var title: NSAttributedString? {
+        return NSAttributedString(string: NSLocalizedString("Report a bug", comment: "Show mail composer to report a bug."), attributes: [NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor])
+    }
+
+
+    override func onClick(navigationController: UINavigationController?) {
+        UIApplication.sharedApplication().openURL(NSURL(string: "mailto:support+ios@brave.com")!)
     }
 }
 

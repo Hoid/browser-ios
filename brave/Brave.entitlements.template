@@ -4,9 +4,5 @@
 <dict>
 	<key>com.apple.security.application-groups</key>
 	<array/>
-	<key>keychain-access-groups</key>
-	<array>
-		<string>$(AppIdentifierPrefix)BUNDLE_ID_PLACEHOLDER</string>
-	</array>
 </dict>
 </plist>

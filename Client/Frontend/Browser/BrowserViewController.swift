@@ -735,6 +735,7 @@ class BrowserViewController: UIViewController {
     private func updateInContentHomePanel(url: NSURL?) {
         if !urlBar.inOverlayMode {
             if AboutUtils.isAboutHomeURL(url){
+                urlBar.updateBookmarkStatus(false)
                 showHomePanelController(inline: (tabManager.selectedTab?.canGoForward ?? false || tabManager.selectedTab?.canGoBack ?? false))
             } else {
                 hideHomePanelController()
@@ -813,7 +814,6 @@ class BrowserViewController: UIViewController {
         // Dispatch to the main thread to update the UI
         dispatch_async(dispatch_get_main_queue()) { _ in
             self.animateBookmarkStar()
-            self.toolbar?.updateBookmarkStatus(true)
             self.urlBar.updateBookmarkStatus(true)
         }
     }
@@ -852,7 +852,6 @@ class BrowserViewController: UIViewController {
         profile.bookmarks.modelFactory >>== {
             $0.removeByURL(url).uponQueue(dispatch_get_main_queue()) { res in
                 if res.isSuccess {
-                    self.toolbar?.updateBookmarkStatus(false)
                     self.urlBar.updateBookmarkStatus(false)
                 }
             }
@@ -864,7 +863,6 @@ class BrowserViewController: UIViewController {
             if bookmark.url == urlBar.currentURL?.absoluteString {
                 if let userInfo = notification.userInfo as? Dictionary<String, Bool>{
                     if let added = userInfo["added"]{
-                        self.toolbar?.updateBookmarkStatus(added)
                         self.urlBar.updateBookmarkStatus(added)
                     }
                 }
@@ -971,7 +969,7 @@ class BrowserViewController: UIViewController {
                     return
                 }
 
-                self.navigationToolbar.updateBookmarkStatus(bookmarked)
+                self.urlBar.updateBookmarkStatus(bookmarked)
             }
         }
     }
@@ -1752,7 +1750,6 @@ extension BrowserViewController: TabManagerDelegate {
                                 return
                             }
 
-                            self.toolbar?.updateBookmarkStatus(isBookmarked)
                             self.urlBar.updateBookmarkStatus(isBookmarked)
                         }
                     }
@@ -2555,7 +2552,7 @@ extension BrowserViewController: ContextMenuHelperDelegate {
         actionSheetController.view.tag = BraveWebView.kContextMenuBlockNavigation
 
         if let url = elements.link, currentTab = tabManager.selectedTab {
-            dialogTitle = url.absoluteString
+            dialogTitle = url.absoluteString.regexReplacePattern("^mailto:", with: "")
             let isPrivate = currentTab.isPrivate
             let newTabTitle = NSLocalizedString("Open In Background", comment: "Context menu item for opening a link in a new tab")
             let openNewTabAction =  UIAlertAction(title: newTabTitle, style: UIAlertActionStyle.Default) { (action: UIAlertAction) in
@@ -2585,7 +2582,9 @@ extension BrowserViewController: ContextMenuHelperDelegate {
             let copyTitle = NSLocalizedString("Copy Link", comment: "Context menu item for copying a link URL to the clipboard")
             let copyAction = UIAlertAction(title: copyTitle, style: UIAlertActionStyle.Default) { (action: UIAlertAction) -> Void in
                 let pasteBoard = UIPasteboard.generalPasteboard()
-                pasteBoard.URL = url
+                if let dialogTitle = dialogTitle, url = NSURL(string: dialogTitle) {
+                    pasteBoard.URL = url
+                }
             }
             actionSheetController.addAction(copyAction)
 

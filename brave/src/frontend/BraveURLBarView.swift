@@ -25,6 +25,19 @@ extension UILabel {
 }
 
 class ButtonWithUnderlayView : UIButton {
+    lazy var starView: UIImageView = {
+        let v = UIImageView()
+        v.contentMode = .Center
+        self.addSubview(v)
+        v.userInteractionEnabled = false
+
+        v.snp_makeConstraints {
+            make in
+            make.center.equalTo(self.snp_center)
+        }
+        return v
+    }()
+
     lazy var underlay: UIView = {
         let v = UIView()
         if UIDevice.currentDevice().userInterfaceIdiom == .Pad {
@@ -36,8 +49,22 @@ class ButtonWithUnderlayView : UIButton {
         }
         v.userInteractionEnabled = false
         v.hidden = true
+
         return v
     }()
+
+    func hideUnderlay(hide: Bool) {
+        underlay.hidden = hide
+        starView.hidden = !hide
+    }
+
+    func setStarImageBookmarked(on: Bool) {
+        if on {
+            starView.image = UIImage(named: "listpanel_bookmarked_star")!.imageWithRenderingMode(.AlwaysOriginal)
+        } else {
+            starView.image = UIImage(named: "listpanel_notbookmarked_star")!.imageWithRenderingMode(.AlwaysTemplate)
+        }
+    }
 }
 
 class BraveURLBarView : URLBarView {
@@ -57,10 +84,11 @@ class BraveURLBarView : URLBarView {
         super.commonInit()
 
         leftSidePanelButton.addTarget(self, action: NSSelectorFromString(SEL_onClickLeftSlideOut), forControlEvents: UIControlEvents.TouchUpInside)
-        leftSidePanelButton.setImage(UIImage(named: "listpanel"), forState: .Normal)
+        leftSidePanelButton.setImage(UIImage(named: "listpanel")?.imageWithRenderingMode(.AlwaysTemplate), forState: .Normal)
         leftSidePanelButton.setImage(UIImage(named: "listpanel_down")?.imageWithRenderingMode(.AlwaysTemplate), forState: .Selected)
         leftSidePanelButton.accessibilityLabel = NSLocalizedString("Bookmarks and History Panel", comment: "Button to show the bookmarks and history panel")
         leftSidePanelButton.tintColor = BraveUX.ActionButtonTintColor
+        leftSidePanelButton.setStarImageBookmarked(false)
 
         braveButton.addTarget(self, action: NSSelectorFromString(SEL_onClickBraveButton) , forControlEvents: UIControlEvents.TouchUpInside)
         braveButton.setImage(UIImage(named: "bravePanelButton"), forState: .Normal)
@@ -380,6 +408,10 @@ class BraveURLBarView : URLBarView {
     }
 
     override func updateBookmarkStatus(isBookmarked: Bool) {
-        leftSidePanelButton.setImage(UIImage(named: isBookmarked ? "listpanel_bookmarked" : "listpanel"), forState: .Normal)
+        if let braveTopVC = getApp().rootViewController.visibleViewController as? BraveTopViewController {
+            braveTopVC.updateBookmarkStatus(isBookmarked)
+        }
+
+        leftSidePanelButton.setStarImageBookmarked(isBookmarked)
     }
 }

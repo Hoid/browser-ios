@@ -22,7 +22,6 @@ protocol BrowserToolbarProtocol {
 
     func updateBackStatus(canGoBack: Bool)
     func updateForwardStatus(canGoForward: Bool)
-    func updateBookmarkStatus(isBookmarked: Bool)
     func updateReloadStatus(isLoading: Bool)
     func updatePageStatus(isWebPage isWebPage: Bool)
 }
@@ -235,15 +234,6 @@ class BrowserToolbar: Toolbar, BrowserToolbarProtocol {
 
     func updateForwardStatus(canGoForward: Bool) {
         forwardButton.enabled = canGoForward
-    }
-
-    func updateBookmarkStatus(isBookmarked: Bool) {
-        bookmarkButton.selected = isBookmarked
-
-        if let braveTopVC = getApp().rootViewController.visibleViewController as? BraveTopViewController {
-            braveTopVC.updateBookmarkStatus(isBookmarked)
-        }
-
     }
 
     func updateReloadStatus(isLoading: Bool) {

@@ -26,7 +26,8 @@ enum KVOStrings: String {
     case kvoURL = "URL"
     case kvoEstimatedProgress = "estimatedProgress"
 
-    static let allValues = [kvoCanGoBack, kvoCanGoForward, kvoLoading, kvoURL, kvoEstimatedProgress]
+    // Going to handle URL separately, see broadcast code
+    static let allValuesExceptURL = [kvoCanGoBack, kvoCanGoForward, kvoLoading, kvoEstimatedProgress]
 }
 
 class BraveWebView: UIWebView {
@@ -258,6 +259,7 @@ class BraveWebView: UIWebView {
         #endif
     }
 
+    var lastBroadcastedKvoUrl: String = ""
     func kvoBroadcast(kvos: [KVOStrings]? = nil) {
         if let _kvos = kvos {
             for item in _kvos {
@@ -266,7 +268,12 @@ class BraveWebView: UIWebView {
             }
         } else {
             // send all
-            kvoBroadcast(KVOStrings.allValues)
+            kvoBroadcast(KVOStrings.allValuesExceptURL)
+            if let url = URL?.absoluteString where url != lastBroadcastedKvoUrl {
+                kvoBroadcast([KVOStrings.kvoURL])
+                lastBroadcastedKvoUrl = url
+            }
+
         }
     }
 
@@ -403,6 +410,11 @@ extension BraveWebView: UIWebViewDelegate {
         if BraveWebView.webviewBuiltinUserAgent == nil {
             BraveWebView.webviewBuiltinUserAgent = request.valueForHTTPHeaderField("User-Agent")
             assert(BraveWebView.webviewBuiltinUserAgent != nil)
+        }
+
+        if let url = request.URL where url.scheme == "mailto" {
+            UIApplication.sharedApplication().openURL(url)
+            return false
         }
 
         #if DEBUG

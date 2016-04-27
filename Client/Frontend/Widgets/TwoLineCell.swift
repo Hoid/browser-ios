@@ -85,8 +85,8 @@ class HistoryTableViewCell: TwoLineTableViewCell {
         separatorInset = UIEdgeInsetsMake(0, TwoLineCellUX.BorderFrameSize + 2 * TwoLineCellUX.BorderViewMargin, 0, 0)
 
         borderView.frame = CGRectMake(TwoLineCellUX.BorderViewMargin, TwoLineCellUX.BorderViewMargin, TwoLineCellUX.BorderFrameSize, TwoLineCellUX.BorderFrameSize)
-        borderView.layer.borderWidth = 0.5
-        borderView.layer.borderColor = UIColor.grayColor().CGColor
+        //borderView.layer.borderWidth = 0.5
+        //borderView.layer.borderColor = UIColor.grayColor().CGColor
 
         twoLineHelper.hasBorderView = true
 
@@ -233,7 +233,7 @@ private class TwoLineCellHelper {
     }
 
     func setupDynamicFonts() {
-        textLabel.font = DynamicFontHelper.defaultHelper.DeviceFontHistoryPanel
+        textLabel.font = DynamicFontHelper.defaultHelper.DeviceFontSmall
         detailTextLabel.font = DynamicFontHelper.defaultHelper.DeviceFontSmallHistoryPanel
     }
 
