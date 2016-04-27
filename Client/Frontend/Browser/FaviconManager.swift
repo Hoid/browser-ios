@@ -34,52 +34,57 @@ class FaviconManager : BrowserHelper {
 
     func userContentController(userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage) {
         let manager = SDWebImageManager.sharedManager()
-        self.browser?.favicons.removeAll(keepCapacity: false)
-        if let tab = self.browser,
-            let currentURL = tab.url,
-            let url = tab.url?.absoluteString {
-                let site = Site(url: url, title: "")
-                var favicons = [Favicon]()
-                if let icons = message.body as? [String: Int] {
-                    for icon in icons {
-                        if let _ = NSURL(string: icon.0), iconType = IconType(rawValue: icon.1) {
-                            let favicon = Favicon(url: icon.0, date: NSDate(), type: iconType)
-                            favicons.append(favicon)
+        guard let tab = browser else { return }
+        tab.favicons.removeAll(keepCapacity: false)
+
+        // Result is in the form {'documentLocation' : document.location.href, 'http://icon url 1': "<type>", 'http://icon url 2': "<type" }
+        guard let icons = message.body as? [String: String], documentLocation = icons["documentLocation"] else { return }
+        guard let currentUrl = NSURL(string: documentLocation) else { return }
+
+        let site = Site(url: documentLocation, title: "")
+        var favicons = [Favicon]()
+        for item in icons {
+            if item.0 == "documentLocation" {
+                continue
+            }
+
+            if let type = Int(item.1), _ = NSURL(string: item.0), iconType = IconType(rawValue: type) {
+                let favicon = Favicon(url: item.0, date: NSDate(), type: iconType)
+                favicons.append(favicon)
+            }
+        }
+
+
+        let options = tab.isPrivate ? [SDWebImageOptions.LowPriority, SDWebImageOptions.CacheMemoryOnly] : [SDWebImageOptions.LowPriority]
+
+        for icon in favicons {
+            if let iconUrl = NSURL(string: icon.url) {
+                manager.downloadImageWithURL(iconUrl, options: SDWebImageOptions(options), progress: nil, completed: { (img, err, cacheType, success, url) -> Void in
+                    let fav = Favicon(url: url.absoluteString,
+                        date: NSDate(),
+                        type: icon.type)
+
+                    if let img = img {
+                        fav.width = Int(img.size.width)
+                        fav.height = Int(img.size.height)
+                    } else {
+                        if favicons.count == 1 && favicons[0].type == .Guess {
+                            // No favicon is indicated in the HTML
+                            self.noFaviconAvailable(tab, atURL: currentUrl)
+                        }
+                        return
+                    }
+
+                    if !tab.isPrivate {
+                        print("adding favicon in \(#function)")
+                        self.profile.favicons.addFavicon(fav, forSite: site)
+                        if tab.favicons.isEmpty {
+                            self.makeFaviconAvailable(tab, atURL: currentUrl, favicon: fav, withImage: img)
                         }
                     }
-                }
-
-                let options = tab.isPrivate ?
-                    [SDWebImageOptions.LowPriority, SDWebImageOptions.CacheMemoryOnly] : [SDWebImageOptions.LowPriority]
-
-                for icon in favicons {
-                    if let iconUrl = NSURL(string: icon.url) {
-                        manager.downloadImageWithURL(iconUrl, options: SDWebImageOptions(options), progress: nil, completed: { (img, err, cacheType, success, url) -> Void in
-                            let fav = Favicon(url: url.absoluteString,
-                                date: NSDate(),
-                                type: icon.type)
-
-                            if let img = img {
-                                fav.width = Int(img.size.width)
-                                fav.height = Int(img.size.height)
-                            } else {
-                                if favicons.count == 1 && favicons[0].type == .Guess {
-                                    // No favicon is indicated in the HTML
-                                    self.noFaviconAvailable(tab, atURL: currentURL)
-                                }
-                                return
-                            }
-
-                            if !tab.isPrivate {
-                                self.profile.favicons.addFavicon(fav, forSite: site)
-                                if tab.favicons.isEmpty {
-                                    self.makeFaviconAvailable(tab, atURL: currentURL, favicon: fav, withImage: img)
-                                }
-                            }
-                            tab.favicons.append(fav)
-                        })
-                    }
-                }
+                    tab.favicons.append(fav)
+                })
+            }
         }
     }
 
