@@ -32,7 +32,6 @@ Client/Frontend/Browser/BrowserPrompts.swift
 Client/Frontend/Browser/BrowserScrollController.swift
 Client/Frontend/Browser/BrowserToolbar.swift
 Client/Frontend/Browser/BrowserTrayAnimators.swift
-Client/Frontend/Browser/BrowserViewController.swift
 Client/Frontend/Browser/ContextMenuHelper.swift
 Client/Frontend/Browser/ErrorPageHelper.swift
 Client/Frontend/Browser/FaviconManager.swift
@@ -131,3 +130,13 @@ Utils/FaviconFetcher.swift
 Utils/MenuHelper.swift
 Utils/Swizzling.m
 Utils/Try.m
+Client/Frontend/Browser/BrowserViewController/BrowserViewController.swift
+Client/Frontend/Browser/BrowserViewController/BrowserViewController+BrowserDelegate.swift
+Client/Frontend/Browser/BrowserViewController/BrowserViewController+ContextMenuHelperDelegate.swift
+Client/Frontend/Browser/BrowserViewController/BrowserViewController+FindInPage.swift
+Client/Frontend/Browser/BrowserViewController/BrowserViewController+KeyCommands.swift
+Client/Frontend/Browser/BrowserViewController/BrowserViewController+ReaderModeDelegate.swift
+Client/Frontend/Browser/BrowserViewController/BrowserViewController+TabManagerDelegate.swift
+Client/Frontend/Browser/BrowserViewController/BrowserViewController+ToolbarAndUrlbarDelegate.swift
+Client/Frontend/Browser/BrowserViewController/BrowserViewController+WKNavigationDelegate.swift
+Client/Frontend/Browser/BrowserViewController/BrowserViewController+WKUIDelegate.swift
