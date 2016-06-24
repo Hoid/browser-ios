@@ -175,7 +175,7 @@ class BraveURLBarView : URLBarView {
                 if toolbarIsShowing {
                     return [backButton, forwardButton, leftSidePanelButton, locationView, braveButton, shareButton, tabsButton]
                 } else {
-                    return [leftSidePanelButton, locationView, braveButton, progressBar]
+                    return [leftSidePanelButton, locationView, braveButton]
                 }
             }
         }
@@ -193,13 +193,11 @@ class BraveURLBarView : URLBarView {
             self.tabsButton.hidden = false
         }
 
-        progressBar.hidden = true
         bookmarkButton.hidden = true
     }
 
     override func prepareOverlayAnimation() {
         super.prepareOverlayAnimation()
-        progressBar.hidden = true
         bookmarkButton.hidden = true
         braveButton.hidden = true
     }
@@ -237,11 +235,6 @@ class BraveURLBarView : URLBarView {
 
         curveShape.hidden = true
         bookmarkButton.hidden = true
-
-        // TODO : remove this entirely
-        progressBar.hidden = true
-        progressBar.alpha = 0.0
-
         bookmarkButton.snp_removeConstraints()
         curveShape.snp_removeConstraints()
 

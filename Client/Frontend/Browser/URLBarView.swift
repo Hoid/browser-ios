@@ -96,9 +96,6 @@ class URLBarView: UIView {
     var isTransitioning: Bool = false {
         didSet {
             if isTransitioning {
-                // Cancel any pending/in-progress animations related to the progress bar
-                self.progressBar.setProgress(1, animated: false)
-                self.progressBar.alpha = 0.0
             }
         }
     }
@@ -144,14 +141,6 @@ class URLBarView: UIView {
         tabsButton.accessibilityIdentifier = "URLBarView.tabsButton"
         tabsButton.accessibilityLabel = NSLocalizedString("Show Tabs", comment: "Accessibility Label for the tabs button in the browser toolbar")
         return tabsButton
-    }()
-
-    lazy var progressBar: UIProgressView = {
-        let progressBar = UIProgressView()
-        progressBar.progressTintColor = URLBarViewUX.ProgressTintColor
-        progressBar.alpha = 0
-        progressBar.hidden = true
-        return progressBar
     }()
 
     lazy var cancelButton: UIButton = {
@@ -221,7 +210,6 @@ class URLBarView: UIView {
         addSubview(curveShape)
         addSubview(scrollToTopButton)
 
-        addSubview(progressBar)
         addSubview(tabsButton)
         addSubview(cancelButton)
 
@@ -245,11 +233,6 @@ class URLBarView: UIView {
         scrollToTopButton.snp_makeConstraints { make in
             make.top.equalTo(self)
             make.left.right.equalTo(self.locationContainer)
-        }
-
-        progressBar.snp_makeConstraints { make in
-            make.top.equalTo(self.snp_bottom)
-            make.width.equalTo(self)
         }
 
         locationView.snp_makeConstraints { make in
@@ -503,7 +486,6 @@ class URLBarView: UIView {
         // Make sure everything is showing during the transition (we'll hide it afterwards).
         self.bringSubviewToFront(self.locationContainer)
         self.cancelButton.hidden = false
-        self.progressBar.hidden = false
         self.shareButton.hidden = !self.toolbarIsShowing
         self.bookmarkButton.hidden = !self.toolbarIsShowing
         self.forwardButton.hidden = !self.toolbarIsShowing
@@ -513,7 +495,6 @@ class URLBarView: UIView {
 
     func transitionToOverlay(didCancel: Bool = false) {
         self.cancelButton.alpha = inOverlayMode ? 1 : 0
-        self.progressBar.alpha = inOverlayMode || didCancel ? 0 : 1
         self.shareButton.alpha = inOverlayMode ? 0 : 1
         self.bookmarkButton.alpha = inOverlayMode ? 0 : 1
         self.forwardButton.alpha = inOverlayMode ? 0 : 1
@@ -550,7 +531,6 @@ class URLBarView: UIView {
 
     func updateViewsForOverlayModeAndToolbarChanges() {
         self.cancelButton.hidden = !inOverlayMode
-        self.progressBar.hidden = inOverlayMode
         self.shareButton.hidden = !self.toolbarIsShowing || inOverlayMode
         self.bookmarkButton.hidden = !self.toolbarIsShowing || inOverlayMode
         self.forwardButton.hidden = !self.toolbarIsShowing || inOverlayMode
@@ -631,9 +611,9 @@ extension URLBarView: BrowserToolbarProtocol {
                 return [locationTextField, cancelButton]
             } else {
                 if toolbarIsShowing {
-                    return [backButton, forwardButton, stopReloadButton, locationView, shareButton, bookmarkButton, tabsButton, progressBar]
+                    return [backButton, forwardButton, stopReloadButton, locationView, shareButton, bookmarkButton, tabsButton]
                 } else {
-                    return [locationView, tabsButton, progressBar, stopReloadButton]
+                    return [locationView, tabsButton, stopReloadButton]
                 }
             }
         }
@@ -697,10 +677,6 @@ extension URLBarView: AutocompleteTextFieldDelegate {
 
 // MARK: UIAppearance
 extension URLBarView {
-    dynamic var progressBarTint: UIColor? {
-        get { return progressBar.progressTintColor }
-        set { progressBar.progressTintColor = newValue }
-    }
 
     dynamic var cancelTextColor: UIColor? {
         get { return cancelButton.titleColorForState(UIControlState.Normal) }
@@ -731,7 +707,6 @@ extension URLBarView: Themeable {
         currentTheme = themeName
         locationBorderColor = theme.borderColor!
         locationActiveBorderColor = theme.activeBorderColor!
-        progressBarTint = theme.tintColor
         cancelTextColor = theme.textColor
         actionButtonTintColor = theme.buttonTintColor
 
