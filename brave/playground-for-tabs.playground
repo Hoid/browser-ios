@@ -1,0 +1,251 @@
+import UIKit
+import SnapKit
+import XCPlayground
+
+
+// to do, 1) left and right overflowIndicators
+//  2) close button
+//  3) select behaviour, scroll tab into view
+
+let visibleWidth = CGFloat(400)
+let minTabWidth = CGFloat(80)
+var tabs = [(UIView, Constraint)]()
+let tabHeight = CGFloat(24)
+
+var leftOverflowIndicator : CAGradientLayer = CAGradientLayer()
+var rightOverflowIndicator : CAGradientLayer = CAGradientLayer()
+
+var cc = [UIColor.blueColor(), UIColor.yellowColor(), UIColor.greenColor()]
+
+
+let base = UIView(frame: CGRectMake(0, 0, visibleWidth, 60))
+let view = UIScrollView(frame: CGRectMake(0, 0, visibleWidth, 60))
+base.addSubview(view)
+
+view.bounces = false
+view.contentSize.width = visibleWidth
+XCPlaygroundPage.currentPage.liveView = base
+
+//////////////////
+func addLeftRightScrollHint(isRightSide isRightSide: Bool, vMaskLayer: CAGradientLayer) {
+    vMaskLayer.removeFromSuperlayer()
+    let colors = [UIColor(white: 0.5, alpha: 0).CGColor, UIColor(white:1.0, alpha: 0.9).CGColor]
+    let locations = [0.9, 1.0]
+    vMaskLayer.startPoint = CGPoint(x: isRightSide ? 0 : 1.0, y: 0.5)
+    vMaskLayer.endPoint = CGPoint(x: isRightSide ? 1.0 : 0, y: 0.5)
+    vMaskLayer.opacity = 0
+    vMaskLayer.colors = colors;
+    vMaskLayer.locations = locations;
+    vMaskLayer.bounds = CGRectMake(0, 1, view.frame.width, tabHeight - 1)
+    vMaskLayer.anchorPoint = CGPointZero;
+    // you must add the mask to the root view, not the scrollView, otherwise the masks will move as the user scrolls!
+    base.layer.addSublayer(vMaskLayer)
+}
+
+addLeftRightScrollHint(isRightSide: false, vMaskLayer: leftOverflowIndicator)
+addLeftRightScrollHint(isRightSide: true, vMaskLayer: rightOverflowIndicator)
+
+
+class Tab : UIView {
+    let title = UIButton()
+    let close = UIButton()
+
+    func setup() {
+        layer.borderWidth = 0.5
+        close.addTarget(self, action: #selector(clicked), forControlEvents: .TouchUpInside)
+title.addTarget(self, action: #selector(selected), forControlEvents: .TouchUpInside)
+
+
+        title.setTitle("asdf asdfaf as", forState: .Normal)
+
+        close.backgroundColor = UIColor.blueColor()
+
+        [close, title].forEach { addSubview($0) }
+
+        close.snp_makeConstraints(closure: { (make) in
+            make.top.bottom.left.equalTo(self)
+            make.width.equalTo(24)
+        })
+
+        title.snp_makeConstraints { (make) in
+            make.top.bottom.equalTo(self)
+            make.left.equalTo(close.snp_right).offset(4)
+            make.right.equalTo(self).inset(4)
+        }
+
+        deselect()
+    }
+
+    func clicked() {
+        removeTab(self)
+    }
+
+    func deselect() {
+        backgroundColor = UIColor.init(white: 90/255, alpha: 1.0)
+        title.titleLabel!.font = UIFont.systemFontOfSize(11)
+         title.setTitleColor(UIColor.init(white: 248/255, alpha: 1.0), forState: .Normal)
+    }
+
+    func selected() {
+        tabs.forEach {
+            ($0.0 as! Tab).deselect()
+        }
+        title.titleLabel!.font = UIFont.systemFontOfSize(11, weight: UIFontWeightSemibold)
+         title.setTitleColor(UIColor.init(white: 255/255, alpha: 1.0), forState: .Normal)
+        backgroundColor = UIColor.init(white: 67/255, alpha: 1.0)
+    }
+}
+
+func tabOverflowWidth(tabCount: Int) -> CGFloat {
+    return CGFloat(tabCount) * minTabWidth - visibleWidth
+}
+
+func updateContentSize(tabCount: Int) {
+    view.contentSize.width = visibleWidth + tabOverflowWidth(tabCount)
+}
+
+func overflowIndicators() {
+    if tabOverflowWidth(tabs.count) < 1 {
+        leftOverflowIndicator.opacity = 0
+        rightOverflowIndicator.opacity = 0
+        return
+    }
+
+    if view.contentOffset.x == 0 {
+        leftOverflowIndicator.opacity = 0
+    } else {
+        leftOverflowIndicator.opacity = 1
+
+    }
+
+    // all the way scrolled right
+    if view.contentOffset.x + view.frame.width == view.contentSize.width {
+        rightOverflowIndicator.opacity = 0
+    } else {
+        rightOverflowIndicator.opacity = 1
+    }
+}
+
+func addTab() {
+    let t = Tab()
+    t.setup()
+
+    view.addSubview(t)
+    t.alpha = 0
+
+    //t.backgroundColor = cc.popLast()
+
+    if cc.count < 1 {
+        cc = [UIColor.blueColor(), UIColor.yellowColor(), UIColor.greenColor()]
+    }
+
+    let w = calcTabWidth(tabs.count + 1)
+
+    UIView.animateWithDuration(0.2, animations: {
+        tabs.forEach {
+            $0.1.updateOffset(w)
+        }
+        view.setNeedsLayout()
+        }, completion: { _ in
+            UIView.animateWithDuration(0.2) {
+                t.alpha = 1
+            }
+        }
+    )
+
+    t.snp_makeConstraints {
+        make in
+        let c = make.width.equalTo(w).constraint
+        make.height.equalTo(tabHeight)
+
+        if let prev = tabs.last {
+            make.left.equalTo(prev.0.snp_right)
+        } else {
+            make.left.equalTo(t.superview!)
+        }
+
+        tabs.append((t, c))
+    }
+
+    updateContentSize(tabs.count)
+    overflowIndicators()
+}
+
+func calcTabWidth(tabCount: Int) -> CGFloat {
+    if tabCount < 1 {
+        return visibleWidth
+    }
+    var w = visibleWidth / (CGFloat(tabCount))
+    if w < minTabWidth {
+        w = minTabWidth
+    }
+    return w
+}
+
+func removeTab(tab: Tab) {
+
+    let w = calcTabWidth(tabs.count - 1)
+    var index = 0
+
+    UIView.animateWithDuration(0.2, animations: {
+            tab.alpha = 0
+            for (i, item) in tabs.enumerate() {
+                if item.0 === tab {
+                    index = i
+                    item.1.updateOffset(0)
+                } else {
+                    item.1.updateOffset(w)
+                }
+            }
+
+            view.setNeedsLayout()
+
+            updateContentSize(tabs.count - 1)
+
+        }) { _ in
+
+        func at(i: Int) -> Tab? {
+            if 0 ..< tabs.count ~= i {
+                return tabs[i].0 as? Tab
+            }
+            return nil
+        }
+
+        let prev = at(index - 1)
+        let next = at(index + 1)
+        next?.snp_makeConstraints(closure: { (make) in
+            if let prev = prev {
+                make.left.equalTo(prev.snp_right)
+            } else {
+                make.left.equalTo(view)
+            }
+        })
+
+        tab.removeFromSuperview()
+        tabs.removeAtIndex(index)
+
+        overflowIndicators()
+    }
+}
+
+
+let adder = UIButton(frame: CGRectMake(0,40,30,30))
+adder.backgroundColor = UIColor.purpleColor()
+view.addSubview(adder)
+
+class Add : NSObject{
+    func adder() {
+        addTab()
+    }
+}
+let add = Add()
+adder.addTarget(add, action: #selector(add.adder), forControlEvents: .TouchUpInside)
+
+
+class Scroll : NSObject, UIScrollViewDelegate {
+    func scrollViewDidScroll(scrollView: UIScrollView) {
+        overflowIndicators()
+    }
+}
+let scroll = Scroll()
+view.delegate = scroll
