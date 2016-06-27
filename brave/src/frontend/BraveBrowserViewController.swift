@@ -85,7 +85,7 @@ class BraveBrowserViewController : BrowserViewController {
     func braveWebContainerConstraintSetup() {
         webViewContainer.snp_remakeConstraints { make in
             make.left.right.equalTo(self.view)
-            make.top.equalTo(self.statusBarOverlay.snp_bottom).offset(UIConstants.ToolbarHeight)
+            make.top.equalTo(self.statusBarOverlay.snp_bottom).offset(BraveURLBarView.CurrentHeight)
             make.height.equalTo(self.view.snp_height).offset(-BraveApp.statusBarHeight())
         }
     }

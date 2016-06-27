@@ -365,9 +365,10 @@ class BrowserViewController: UIViewController {
 
         header.snp_makeConstraints { make in
             scrollController.headerTopConstraint = make.top.equalTo(snp_topLayoutGuideBottom).constraint
-            make.height.equalTo(UIConstants.ToolbarHeight)
+            make.height.equalTo(UIConstants.ToolbarHeight + TabRowHeight)
             make.left.right.equalTo(self.view)
         }
+        header.layer.borderWidth = 5
 
         headerBackdrop.snp_makeConstraints { make in
             make.edges.equalTo(self.header)

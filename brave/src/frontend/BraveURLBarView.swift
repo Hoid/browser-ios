@@ -1,5 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+let TabRowHeight = CGFloat(26)
+
 // To hide the curve effect
 class HideCurveView : CurveView {
     override func drawRect(rect: CGRect) {}
@@ -69,9 +71,13 @@ class ButtonWithUnderlayView : UIButton {
 
 class BraveURLBarView : URLBarView {
 
+    static let CurrentHeight = TabRowHeight + UIConstants.ToolbarHeight
+
     private static weak var currentInstance: BraveURLBarView?
     lazy var leftSidePanelButton: ButtonWithUnderlayView = { return ButtonWithUnderlayView() }()
     lazy var braveButton = { return UIButton() }()
+
+    let tabsRow = UIScrollView()
 
     override func commonInit() {
         BraveURLBarView.currentInstance = self
@@ -130,6 +136,35 @@ class BraveURLBarView : URLBarView {
         URLBarViewUX.Themes[Theme.NormalMode] = theme
 
         stopReloadButton.imageEdgeInsets = UIEdgeInsetsMake(0, 6, 0, 0)
+
+
+        tabsRow.backgroundColor = UIColor.redColor()
+        addSubview(tabsRow)
+
+        let a = UILabel()
+        let b = UILabel()
+        let c = UILabel()
+        var cc = [UIColor.blueColor(), UIColor.yellowColor(), UIColor.greenColor()]
+        [a, b, c].forEach {
+            tabsRow.addSubview($0)
+            $0.backgroundColor = cc.popLast()
+        }
+        [a,b,c].forEach{ $0.snp_makeConstraints { (make) in
+            make.bottom.equalTo(tabsRow)
+            make.width.equalTo(50)
+            make.height.equalTo(20)
+        }}
+        a.snp_makeConstraints { (make) in
+            make.left.equalTo(tabsRow)
+        }
+        b.snp_makeConstraints { (make) in
+            make.left.equalTo(a)
+        }
+        c.snp_makeConstraints { (make) in
+            make.left.equalTo(b)
+        }
+
+
     }
 
     override func applyTheme(themeName: String) {
@@ -227,6 +262,12 @@ class BraveURLBarView : URLBarView {
     override func updateConstraints() {
         super.updateConstraints()
 
+        bringSubviewToFront(tabsRow)
+        tabsRow.snp_makeConstraints { (make) in
+            make.bottom.left.right.equalTo(self)
+            make.height.equalTo(TabRowHeight)
+        }
+
         leftSidePanelButton.underlay.snp_makeConstraints {
             make in
             make.left.right.equalTo(leftSidePanelButton).inset(4)
@@ -290,6 +331,10 @@ class BraveURLBarView : URLBarView {
     }
 
     override func setupConstraints() {
+
+        if !tabsRow.hidden {
+            
+        }
 
         backButton.snp_makeConstraints { make in
             make.left.centerY.equalTo(self)
