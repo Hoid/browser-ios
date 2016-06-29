@@ -96,15 +96,15 @@ class BraveTopViewController : UIViewController {
                 leftConstraint = make.left.equalTo(view).constraint
             } else {
                 make.right.left.equalTo(view)
-
-                browserViewController.header.snp_remakeConstraints {
-                    make in
-                    leftConstraint = make.left.equalTo(view).constraint
-                    rightConstraint = make.right.equalTo(view).constraint
-                }
             }
         }
 
+        if UIDevice.currentDevice().userInterfaceIdiom != .Phone {
+            browserViewController.header.snp_makeConstraints { make in
+                leftConstraint = make.left.equalTo(view).constraint
+                rightConstraint = make.right.equalTo(view).constraint
+            }
+        }
     }
 
     override func preferredStatusBarStyle() -> UIStatusBarStyle {

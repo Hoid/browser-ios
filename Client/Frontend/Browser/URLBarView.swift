@@ -229,67 +229,10 @@ class URLBarView: UIView {
         updateViewsForOverlayModeAndToolbarChanges()
     }
 
-    func setupConstraints() {
-        scrollToTopButton.snp_makeConstraints { make in
-            make.top.equalTo(self)
-            make.left.right.equalTo(self.locationContainer)
-        }
-
-        locationView.snp_makeConstraints { make in
-            make.edges.equalTo(self.locationContainer)
-        }
-
-        cancelButton.snp_makeConstraints { make in
-            make.centerY.equalTo(self.locationContainer)
-            make.trailing.equalTo(self)
-        }
-
-        tabsButton.snp_makeConstraints { make in
-            make.centerY.equalTo(self.locationContainer)
-            make.trailing.equalTo(self)
-            make.size.equalTo(UIConstants.ToolbarHeight)
-        }
-
-        curveShape.snp_makeConstraints { make in
-            make.top.left.bottom.equalTo(self)
-            self.rightBarConstraint = make.right.equalTo(self).constraint
-            self.rightBarConstraint?.updateOffset(defaultRightOffset)
-        }
-
-        backButton.snp_makeConstraints { make in
-            make.left.centerY.equalTo(self)
-            make.size.equalTo(UIConstants.ToolbarHeight)
-        }
-
-        forwardButton.snp_makeConstraints { make in
-            make.left.equalTo(self.backButton.snp_right)
-            make.centerY.equalTo(self)
-            make.size.equalTo(backButton)
-        }
-
-        stopReloadButton.snp_makeConstraints { make in
-            make.left.equalTo(self.forwardButton.snp_right)
-            make.centerY.equalTo(self)
-            make.size.equalTo(backButton)
-        }
-
-        shareButton.snp_makeConstraints { make in
-            make.right.equalTo(self.bookmarkButton.snp_left)
-            make.centerY.equalTo(self)
-            make.size.equalTo(backButton)
-        }
-
-        bookmarkButton.snp_makeConstraints { make in
-            make.right.equalTo(self.tabsButton.snp_left).offset(URLBarViewUX.URLBarCurveOffsetLeft)
-            make.centerY.equalTo(self)
-            make.size.equalTo(backButton)
-        }
-    }
+    func setupConstraints() {}
 
     override func updateConstraints() {
         super.updateConstraints()
-
-        // BRAVE removed
     }
 
     func createLocationTextField() {

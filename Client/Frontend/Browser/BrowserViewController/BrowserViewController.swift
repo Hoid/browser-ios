@@ -24,6 +24,7 @@ struct BrowserViewControllerUX {
 }
 
 class BrowserViewController: UIViewController {
+    var delegates = [WeakBrowserTabStateDelegate]()
     var homePanelController: HomePanelViewController?
     var webViewContainer: UIView!
     var urlBar: URLBarView!
@@ -359,16 +360,16 @@ class BrowserViewController: UIViewController {
     }
 
     func setupConstraints() {
-        urlBar.snp_makeConstraints { make in
-            make.edges.equalTo(self.header)
-        }
 
         header.snp_makeConstraints { make in
             scrollController.headerTopConstraint = make.top.equalTo(snp_topLayoutGuideBottom).constraint
-            make.height.equalTo(UIConstants.ToolbarHeight + TabRowHeight)
-            make.left.right.equalTo(self.view)
+            make.height.equalTo(BraveURLBarView.CurrentHeight)
+
+            if UIDevice.currentDevice().userInterfaceIdiom == .Phone {
+                // iPad layout is customized in BraveTopViewController for showing panels
+                make.left.right.equalTo(header.superview!)
+            }
         }
-        header.layer.borderWidth = 5
 
         headerBackdrop.snp_makeConstraints { make in
             make.edges.equalTo(self.header)
@@ -633,7 +634,7 @@ class BrowserViewController: UIViewController {
         // Remake constraints even if we're already showing the home controller.
         // The home controller may change sizes if we tap the URL bar while on about:home.
         homePanelController?.view.snp_remakeConstraints { make in
-            make.top.equalTo(self.urlBar.snp_bottom)
+            make.top.equalTo(self.header.snp_bottom)
             make.left.right.equalTo(self.view)
             if self.homePanelIsInline {
                 make.bottom.equalTo(self.toolbar?.snp_top ?? self.view.snp_bottom)

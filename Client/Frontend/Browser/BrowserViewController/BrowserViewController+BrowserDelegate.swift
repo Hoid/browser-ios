@@ -10,6 +10,24 @@ private let KVOCanGoBack = "canGoBack"
 private let KVOCanGoForward = "canGoForward"
 private let KVOContentSize = "contentSize"
 
+protocol BrowserTabStateDelegate: class {
+    func browserUrlChanged(browser: Browser)
+    func browserProgressChanged(browser: Browser)
+}
+
+// We can't use a WeakList here because this is a protocol.
+class WeakBrowserTabStateDelegate {
+    weak var value : BrowserTabStateDelegate?
+
+    init (value: BrowserTabStateDelegate) {
+        self.value = value
+    }
+
+    func get() -> BrowserTabStateDelegate? {
+        return value
+    }
+}
+
 extension BrowserViewController: BrowserDelegate {
 
     override func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String: AnyObject]?, context: UnsafeMutablePointer<Void>) {
@@ -22,21 +40,33 @@ extension BrowserViewController: BrowserDelegate {
         case KVOEstimatedProgress:
             guard let progress = change?[NSKeyValueChangeNewKey] as? Float else { break }
             urlBar.updateProgressBar(progress)
+
+            if let tab = tabManager.selectedTab {
+                for delegate in delegates {
+                    delegate.get()?.browserProgressChanged(tab)
+                }
+            }
+
         case KVOLoading:
             guard let loading = change?[NSKeyValueChangeNewKey] as? Bool else { break }
             toolbar?.updateReloadStatus(loading)
             urlBar.updateReloadStatus(loading)
-            //            if (!loading) {
-            //                runScriptsOnWebView(webView)
-        //            }
+
         case KVOURL:
-            if let tab = tabManager.selectedTab where tab.webView?.URL == nil {
-                log.debug("URL is nil!")
+            if let tab = tabManager.selectedTab {
+                if tab.webView?.URL == nil {
+                    log.debug("URL is nil!")
+                }
+
+                if tab.webView === object && !tab.restoring {
+                    updateUIForReaderHomeStateForTab(tab)
+                }
+
+                for delegate in delegates {
+                    delegate.get()?.browserUrlChanged(tab)
+                }
             }
 
-            if let tab = tabManager.selectedTab where tab.webView === object && !tab.restoring {
-                updateUIForReaderHomeStateForTab(tab)
-            }
         case KVOCanGoBack:
             guard let canGoBack = change?[NSKeyValueChangeNewKey] as? Bool else { break }
             navigationToolbar.updateBackStatus(canGoBack)

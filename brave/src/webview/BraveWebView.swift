@@ -122,16 +122,22 @@ class BraveWebView: UIWebView {
 
     private var _url: (url: NSURL?, isReliableSource: Bool, prevUrl: NSURL?) = (nil, false, nil)
 
+    private var lastBroadcastedKvoUrl: String = ""
     func setUrl(url: NSURL?, reliableSource: Bool) {
         _url.prevUrl = _url.url
         _url.isReliableSource = reliableSource
         if URL?.absoluteString.endsWith("?") ?? false {
             if let noQuery = URL?.absoluteString.componentsSeparatedByString("?")[0] {
                 _url.url = NSURL(string: noQuery)
-                return
             }
+        } else {
+            _url.url = url
         }
-        _url.url = url
+
+        if let url = URL?.absoluteString where url != lastBroadcastedKvoUrl {
+            kvoBroadcast([KVOStrings.kvoURL])
+            lastBroadcastedKvoUrl = url
+        }
     }
 
     func isUrlSourceReliable() -> Bool {
@@ -400,7 +406,6 @@ class BraveWebView: UIWebView {
         }
     }
 
-    var lastBroadcastedKvoUrl: String = ""
     func kvoBroadcast(kvos: [KVOStrings]? = nil) {
         if let _kvos = kvos {
             for item in _kvos {
@@ -408,13 +413,8 @@ class BraveWebView: UIWebView {
                 didChangeValueForKey(item.rawValue)
             }
         } else {
-            // send all
+            // URL has its own broadcasting when set
             kvoBroadcast(KVOStrings.allValuesExceptURL)
-            if let url = URL?.absoluteString where url != lastBroadcastedKvoUrl {
-                kvoBroadcast([KVOStrings.kvoURL])
-                lastBroadcastedKvoUrl = url
-            }
-
         }
     }
 
@@ -531,7 +531,6 @@ class BraveWebView: UIWebView {
             delay(0.2) {
                 [weak self] in
                 self?.setUrl(urlInfo, reliableSource: true)
-                self?.kvoBroadcast([KVOStrings.kvoURL])
             }
         }
     }

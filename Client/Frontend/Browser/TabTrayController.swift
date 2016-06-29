@@ -656,7 +656,7 @@ extension TabTrayController: TabManagerDelegate {
     func tabManager(tabManager: TabManager, didSelectedTabChange selected: Browser?, previous: Browser?) {
     }
 
-    func tabManager(tabManager: TabManager, didCreateTab tab: Browser) {
+    func tabManager(tabManager: TabManager, didCreateWebView tab: Browser) {
     }
 
     func tabManager(tabManager: TabManager, didAddTab tab: Browser) {
