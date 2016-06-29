@@ -189,6 +189,9 @@ class Browser: NSObject, BrowserWebViewDelegate {
                 restoring = true
             #endif
             lastTitle = sessionData.currentTitle
+            if let title = lastTitle {
+                webView.title = title
+            }
             var updatedURLs = [String]()
             for url in sessionData.urls {
                 let updatedURL = WebServer.sharedInstance.updateLocalURL(url)!.absoluteString
