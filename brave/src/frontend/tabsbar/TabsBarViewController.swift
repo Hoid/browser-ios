@@ -235,7 +235,28 @@ extension TabsBarViewController: TabWidgetDelegate {
 }
 
 extension TabsBarViewController: TabManagerDelegate {
+    func tabManagerDidEnterPrivateBrowsingMode(tabManager: TabManager) {
+        assert(NSThread.currentThread().isMainThread)
+        tabs.forEach{ $0.removeFromSuperview() }
+        tabs.removeAll()
+    }
+
+    func tabManagerDidExitPrivateBrowsingMode(tabManager: TabManager) {
+        assert(NSThread.currentThread().isMainThread)
+        tabs.forEach{ $0.removeFromSuperview() }
+        tabs.removeAll()
+
+        tabManager.tabs.forEach {
+            let t = addTab(browser: $0)
+            t.title.setTitle($0.lastTitle, forState: .Normal)
+            if tabManager.selectedTab === $0 {
+                tabWidgetSelected(t)
+            }
+        }
+    }
+
     func tabManager(tabManager: TabManager, didSelectedTabChange selected: Browser?, previous: Browser?) {
+        assert(NSThread.currentThread().isMainThread)
         tabs.forEach { tabWidget in
             if tabWidget.browser === selected {
                 tabWidgetSelected(tabWidget)
@@ -253,6 +274,7 @@ extension TabsBarViewController: TabManagerDelegate {
     func tabManager(tabManager: TabManager, didAddTab tab: Browser) {}
 
     func tabManager(tabManager: TabManager, didRemoveTab tab: Browser) {
+        assert(NSThread.currentThread().isMainThread)
         tabs.forEach { tabWidget in
             if tabWidget.browser === tab {
                 removeTab(tabWidget)
@@ -260,7 +282,14 @@ extension TabsBarViewController: TabManagerDelegate {
         }
     }
 
-    func tabManagerDidRestoreTabs(tabManager: TabManager) {}
+    func tabManagerDidRestoreTabs(tabManager: TabManager) {
+        delay(0.5) { [weak self] in
+            self?.tabs.forEach {
+                $0.updateTitle_throttled()
+            }
+        }
+    }
+
     func tabManagerDidAddTabs(tabManager: TabManager) {}
 }
 

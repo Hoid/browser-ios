@@ -84,7 +84,7 @@ class TabWidget : UIView {
     }
 
     private var titleUpdateScheduled = false
-    private func updateTitle_throttled() {
+    func updateTitle_throttled() {
         if titleUpdateScheduled {
             return
         }
