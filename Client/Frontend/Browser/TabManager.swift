@@ -645,12 +645,7 @@ extension TabManager {
                 continue
             }
 
-            let tab: Browser
-            if #available(iOS 9, *) {
-                tab = self.addTab(flushToDisk: false, zombie: true, isPrivate: savedTab.isPrivate)
-            } else {
-                tab = self.addTab(flushToDisk: false, zombie: true)
-            }
+            let tab = self.addTab(flushToDisk: false, zombie: true)
             tab.lastExecutedTime = savedTab.sessionData?.lastUsedTime
 
             // Set the UUID for the tab, asynchronously fetch the UIImage, then store
@@ -671,6 +666,10 @@ extension TabManager {
 
             tab.sessionData = savedTab.sessionData
             tab.lastTitle = savedTab.title
+
+            if let w = tab.webView {
+                tab.restore(w)
+            }
         }
 
         if tabToSelect == nil {
@@ -690,8 +689,6 @@ extension TabManager {
         if let tab = tabToSelect {
             log.debug("Selecting a tab.")
             selectTab(tab)
-            //log.debug("Creating webview for selected tab.")
-            //tab.createWebview()
         }
 
         log.debug("Done.")

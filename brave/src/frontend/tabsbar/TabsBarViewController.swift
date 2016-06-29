@@ -5,8 +5,6 @@ import SnapKit
 let minTabWidth = CGFloat(180)
 let tabHeight = CGFloat(24)
 
-var cc = [UIColor.blueColor(), UIColor.yellowColor(), UIColor.greenColor()]
-
 class TabsBarViewController: UIViewController {
     var scrollView: UIScrollView!
 
@@ -46,8 +44,16 @@ class TabsBarViewController: UIViewController {
     }
 
     func updateContentSize(tabCount: Int) {
+        struct staticWidth { static var val = CGFloat(0) }
+        if staticWidth.val != view.bounds.width {
+            let w = calcTabWidth(tabs.count)
+            tabs.forEach {
+                $0.widthConstraint?.updateOffset(w)
+            }
+            overflowIndicators()
+        }
+        staticWidth.val = view.bounds.width
         scrollView.contentSize = CGSizeMake(view.bounds.width + tabOverflowWidth(tabCount), view.bounds.height)
-        print(scrollView.contentSize)
     }
 
     func overflowIndicators() {
@@ -97,12 +103,6 @@ class TabsBarViewController: UIViewController {
 
         scrollView.addSubview(t)
         t.alpha = 0
-
-        //t.backgroundColor = cc.popLast()
-
-        if cc.count < 1 {
-            cc = [UIColor.blueColor(), UIColor.yellowColor(), UIColor.greenColor()]
-        }
 
         let w = calcTabWidth(tabs.count + 1)
 
