@@ -77,7 +77,7 @@ class PrivateBrowsing {
 
         isOn = true
 
-        getApp().tabManager.tabs.forEach{ $0.deleteWebView() }
+        getApp().tabManager.enterPrivateBrowsingMode(self)
 
         cookiesFileDiskOperation(.SavePublicBackup)
 
@@ -145,10 +145,9 @@ class PrivateBrowsing {
                     storage.setCookie(cookie.0)
                 }
                 self.nonprivateCookies = [NSHTTPCookie: Bool]()
-                if getApp().tabManager.tabs.count < 1 {
-                     getApp().tabManager.addTab()
-                }
-                getApp().tabManager.selectTab(getApp().tabManager.tabs.first)
+
+                getApp().tabManager.exitPrivateBrowsingMode(self)
+
                 self.exitDeferred.fillIfUnfilled(())
                 ReentrantGuard.inFunc = false
             }

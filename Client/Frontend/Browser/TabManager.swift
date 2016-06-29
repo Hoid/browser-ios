@@ -16,6 +16,13 @@ protocol TabManagerDelegate: class {
     func tabManager(tabManager: TabManager, didRemoveTab tab: Browser)
     func tabManagerDidRestoreTabs(tabManager: TabManager)
     func tabManagerDidAddTabs(tabManager: TabManager)
+    func tabManagerDidEnterPrivateBrowsingMode(tabManager: TabManager) // has default impl
+    func tabManagerDidExitPrivateBrowsingMode(tabManager: TabManager) // has default impl
+}
+
+extension TabManagerDelegate { // add default implementation for 'optional' funcs
+    func tabManagerDidEnterPrivateBrowsingMode(tabManager: TabManager) {}
+    func tabManagerDidExitPrivateBrowsingMode(tabManager: TabManager) {}
 }
 
 protocol TabManagerStateDelegate: class {
@@ -715,6 +722,25 @@ extension TabManager {
         }
 
         isRestoring = false
+    }
+
+    // Only call from PB class
+    func enterPrivateBrowsingMode(_: PrivateBrowsing) {
+        tabs.forEach{ $0.deleteWebView() }
+        delegates.forEach {
+            $0.get()?.tabManagerDidEnterPrivateBrowsingMode(self)
+        }
+    }
+
+    func exitPrivateBrowsingMode(_: PrivateBrowsing) {
+        delegates.forEach {
+            $0.get()?.tabManagerDidExitPrivateBrowsingMode(self)
+        }
+
+        if getApp().tabManager.tabs.count < 1 {
+            getApp().tabManager.addTab()
+        }
+        getApp().tabManager.selectTab(getApp().tabManager.tabs.first)
     }
 }
 
