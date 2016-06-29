@@ -253,10 +253,16 @@ class BraveWebView: UIWebView {
         if (!loading ||
             stringByEvaluatingJavaScriptFromString("document.readyState.toLowerCase()") == "complete") && !isUrlSourceReliable()
         {
-            title = stringByEvaluatingJavaScriptFromString("document.title") ?? ""
+            updateTitleFromHtml()
             internalIsLoadingEndedFlag = false // need to set this to bypass loadingCompleted() precondition
             loadingCompleted()
             kvoBroadcast()
+        }
+    }
+
+    func updateTitleFromHtml() {
+        if let t = stringByEvaluatingJavaScriptFromString("document.title") where !t.isEmpty {
+            title = t
         }
     }
 
@@ -381,7 +387,9 @@ class BraveWebView: UIWebView {
             guard let docLoc = me.stringByEvaluatingJavaScriptFromString("document.location.href") else { return }
 
             if docLoc != me.prevDocumentLocation {
-                me.title = me.stringByEvaluatingJavaScriptFromString("document.title") ?? NSURL(string: docLoc)?.baseDomain() ?? ""
+                if !(me.URL?.absoluteString.startsWith(WebServer.sharedInstance.base) ?? false) && !docLoc.startsWith(WebServer.sharedInstance.base) {
+                    me.title = me.stringByEvaluatingJavaScriptFromString("document.title") ?? NSURL(string: docLoc)?.baseDomain() ?? ""
+                }
                 #if DEBUG
                 print("Adding history, TITLE:\(me.title)")
                 #endif
@@ -722,7 +730,9 @@ extension BraveWebView: UIWebViewDelegate {
         let pageInfoArray = pageInfo.componentsSeparatedByString("|")
 
         let readyState = pageInfoArray.first // ;print("readyState:\(readyState)")
-        title = pageInfoArray.last ?? ""
+        if let t = pageInfoArray.last where !t.isEmpty {
+            title = t
+        }
         progress?.webViewDidFinishLoad(documentReadyState: readyState)
 
         backForwardList.update()
