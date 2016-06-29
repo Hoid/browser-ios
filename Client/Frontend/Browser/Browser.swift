@@ -446,6 +446,14 @@ class Browser: NSObject, BrowserWebViewDelegate {
             screenshotsForHistory.addForLocation(loc, image: screenshot)
         }
 #endif
+        guard let screenshot = screenshot else { return }
+        let cg = screenshot.CGImage
+        let cim:CIImage? = cg != nil ? CIImage(CGImage: cg!) : nil
+        if cim == nil {
+            // screenshot is empty
+            return
+        }
+
         self.screenshot = screenshot
         if revUUID {
             self.screenshotUUID = NSUUID()
