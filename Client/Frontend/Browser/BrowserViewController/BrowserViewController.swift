@@ -361,7 +361,7 @@ class BrowserViewController: UIViewController {
 
     func setupConstraints() {
 
-        header.snp_makeConstraints { make in
+        header.snp_remakeConstraints { make in
             scrollController.headerTopConstraint = make.top.equalTo(snp_topLayoutGuideBottom).constraint
             make.height.equalTo(BraveURLBarView.CurrentHeight)
 

@@ -30,14 +30,16 @@ class TabWidget : UIView {
 
         close.setImage(UIImage(named: "stop")!, forState: .Normal)
         close.snp_makeConstraints(closure: { (make) in
-            make.top.bottom.left.equalTo(self)
+            make.top.bottom.equalTo(self)
+            make.left.equalTo(self).inset(4)
             make.width.equalTo(24)
         })
         close.tintColor = UIColor.lightGrayColor()
 
+
         title.snp_makeConstraints { (make) in
             make.top.bottom.equalTo(self)
-            make.left.equalTo(close.snp_right).offset(4)
+            make.left.equalTo(close.snp_right)
             make.right.equalTo(self).inset(4)
         }
 

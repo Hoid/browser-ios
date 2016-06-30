@@ -133,7 +133,7 @@ class BraveScrollController: NSObject {
 
             if !isScrollHeightIsLargeEnoughForScrolling() {
                 if (scrollView?.contentInset.bottom == 0) {
-                    let h = BraveApp.isIPhonePortrait() ? UIConstants.ToolbarHeight * 2 : UIConstants.ToolbarHeight
+                    let h = BraveApp.isIPhonePortrait() ? UIConstants.ToolbarHeight + BraveURLBarView.CurrentHeight : BraveURLBarView.CurrentHeight
                     setContentInset(top: 0, bottom: h)
                 }
             } else {
@@ -243,20 +243,22 @@ private extension BraveScrollController {
             return
         }
 
-        let updatedOffset = toolbarsShowing ? clamp(verticalTranslation - delta, min: -UIConstants.ToolbarHeight, max: 0) :
-            clamp(verticalTranslation - delta, min: 0, max: UIConstants.ToolbarHeight)
+        let updatedOffset = toolbarsShowing ? clamp(verticalTranslation - delta, min: -BraveURLBarView.CurrentHeight, max: 0) :
+            clamp(verticalTranslation - delta, min: 0, max: BraveURLBarView.CurrentHeight)
 
         verticalTranslation = updatedOffset
 
-        if (fabs(updatedOffset) > 0 && fabs(updatedOffset) < UIConstants.ToolbarHeight) {
+        if (fabs(updatedOffset) > 0 && fabs(updatedOffset) < BraveURLBarView.CurrentHeight) {
             // this stops parallax effect where the scrolling rate is doubled while hiding/showing toolbars
             scrollView?.contentOffset = CGPoint(x: contentOffset.x, y: contentOffset.y - delta)
         }
 
         header?.layer.transform = CATransform3DMakeAffineTransform(CGAffineTransformMakeTranslation(0, verticalTranslation))
-        footer?.layer.transform = CATransform3DMakeAffineTransform(CGAffineTransformMakeTranslation(0, -verticalTranslation))
 
-        let webViewVertTranslation = toolbarsShowing ? verticalTranslation : verticalTranslation - UIConstants.ToolbarHeight
+        let footerTranslation = verticalTranslation > UIConstants.ToolbarHeight ? -UIConstants.ToolbarHeight : -verticalTranslation
+        footer?.layer.transform = CATransform3DMakeAffineTransform(CGAffineTransformMakeTranslation(0, footerTranslation))
+
+        let webViewVertTranslation = toolbarsShowing ? verticalTranslation : verticalTranslation - BraveURLBarView.CurrentHeight
         let webView = getApp().browserViewController.webViewContainer
         webView.layer.transform = CATransform3DMakeAffineTransform(CGAffineTransformMakeTranslation(0, webViewVertTranslation))
 
@@ -290,8 +292,8 @@ private extension BraveScrollController {
             // TODO this code is only being used to show toolbars, so right now hard-code for that case, obviously if/when hide is added, update the code to support that
             let webView = getApp().browserViewController.webViewContainer
             webView.layer.transform = CATransform3DIdentity
-            if self.contentOffset.y > UIConstants.ToolbarHeight {
-                self.scrollView?.contentOffset.y += UIConstants.ToolbarHeight
+            if self.contentOffset.y > BraveURLBarView.CurrentHeight {
+                self.scrollView?.contentOffset.y += BraveURLBarView.CurrentHeight
             }
         }
 
@@ -410,7 +412,7 @@ extension BraveScrollController: UIScrollViewDelegate {
         }
 
         if verticalTranslation < 0 && headerTopOffset == 0 {
-            headerTopOffset = -UIConstants.ToolbarHeight
+            headerTopOffset = -BraveURLBarView.CurrentHeight
             footerBottomOffset = UIConstants.ToolbarHeight
             urlBar?.updateAlphaForSubviews(0)
         } else if verticalTranslation > UIConstants.ToolbarHeight / 2.0 && headerTopOffset != 0 {

@@ -2,6 +2,9 @@
 import UIKit
 import SnapKit
 
+let kPrefKeyTabsBarOn = "kPrefKeyTabsBarOn"
+let kPrefKeyTabsBarOnDefaultValue = UIDevice.currentDevice().userInterfaceIdiom == .Pad
+
 let minTabWidth = CGFloat(180)
 let tabHeight = CGFloat(24)
 

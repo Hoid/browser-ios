@@ -52,6 +52,12 @@ class BraveSettingsView : AppSettingsTableViewController {
 
             ,BoolSetting(prefs: prefs, prefKey: "blockPopups", defaultValue: true,
                 titleText: NSLocalizedString("Block Popups", comment: "Setting to enable popup blocking"))
+
+            ,BoolSetting(prefs: prefs, prefKey: kPrefKeyTabsBarOn, defaultValue: kPrefKeyTabsBarOnDefaultValue,
+                titleText: NSLocalizedString("Show Tabs Bar", comment: "Setting to show/hide the tabs bar"), statusText: nil,
+                settingDidChange: { value in
+                    (getApp().browserViewController.urlBar as! BraveURLBarView).updateTabsBarOn()
+            })
         ]
 
         #if !DISABLE_THIRD_PARTY_PASSWORD_SNACKBAR

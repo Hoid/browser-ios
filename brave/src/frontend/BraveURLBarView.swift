@@ -1,7 +1,6 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 let TabsBarHeight = CGFloat(26)
-var showTabsBar = true
 
 // To hide the curve effect
 class HideCurveView : CurveView {
@@ -138,11 +137,27 @@ class BraveURLBarView : URLBarView {
 
         stopReloadButton.imageEdgeInsets = UIEdgeInsetsMake(0, 6, 0, 0)
 
-        if (showTabsBar) {
-            addSubview(tabsBarController.view)
-            getApp().browserViewController.addChildViewController(tabsBarController)
-            tabsBarController.didMoveToParentViewController(getApp().browserViewController)
-            BraveURLBarView.CurrentHeight = TabsBarHeight + UIConstants.ToolbarHeight
+        updateTabsBarOn(true)
+    }
+
+    func updateTabsBarOn(duringStartup: Bool = false) {
+        if (BraveApp.getPrefs()?.boolForKey(kPrefKeyTabsBarOn) ?? kPrefKeyTabsBarOnDefaultValue) {
+            if tabsBarController.view.superview == nil {
+                addSubview(tabsBarController.view)
+                getApp().browserViewController.addChildViewController(tabsBarController)
+                tabsBarController.didMoveToParentViewController(getApp().browserViewController)
+                BraveURLBarView.CurrentHeight = TabsBarHeight + UIConstants.ToolbarHeight
+            }
+        } else if tabsBarController.view.superview != nil {
+            tabsBarController.view.removeFromSuperview()
+            tabsBarController.willMoveToParentViewController(nil)
+            tabsBarController.removeFromParentViewController()
+            BraveURLBarView.CurrentHeight = UIConstants.ToolbarHeight
+        }
+
+        if !duringStartup {
+            self.setupConstraints()
+            getApp().browserViewController.setupConstraints()
         }
     }
 
@@ -241,7 +256,7 @@ class BraveURLBarView : URLBarView {
     override func updateConstraints() {
         super.updateConstraints()
 
-        if showTabsBar {
+        if BraveApp.getPrefs()?.boolForKey(kPrefKeyTabsBarOn) ?? kPrefKeyTabsBarOnDefaultValue {
             bringSubviewToFront(tabsBarController.view)
             tabsBarController.view.snp_makeConstraints { (make) in
                 make.bottom.left.right.equalTo(self)
@@ -312,9 +327,7 @@ class BraveURLBarView : URLBarView {
     }
 
     override func setupConstraints() {
-
-
-        backButton.snp_makeConstraints { make in
+        backButton.snp_remakeConstraints { make in
             make.centerY.equalTo(self.locationContainer)
             make.left.equalTo(self)
             make.size.equalTo(UIConstants.ToolbarHeight)
