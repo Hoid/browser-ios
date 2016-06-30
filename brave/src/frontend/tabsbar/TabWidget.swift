@@ -70,7 +70,7 @@ class TabWidget : UIView {
     func deselect() {
         backgroundColor = UIColor.init(white: 90/255, alpha: 1.0)
         title.titleLabel!.font = UIFont.systemFontOfSize(11)
-        title.setTitleColor(UIColor.init(white: 248/255, alpha: 1.0), forState: .Normal)
+        title.setTitleColor(UIColor.init(white: 230/255, alpha: 1.0), forState: .Normal)
     }
 
     func selected() {
@@ -80,7 +80,7 @@ class TabWidget : UIView {
     func setStyleToSelected() {
         title.titleLabel!.font = UIFont.systemFontOfSize(11, weight: UIFontWeightSemibold)
         title.setTitleColor(UIColor.init(white: 255/255, alpha: 1.0), forState: .Normal)
-        backgroundColor = UIColor.init(white: 67/255, alpha: 1.0)
+        backgroundColor = UIColor.clearColor()
     }
 
     private var titleUpdateScheduled = false

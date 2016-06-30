@@ -227,10 +227,12 @@ extension TabsBarViewController: TabWidgetDelegate {
             getApp().tabManager.selectTab(tab.browser)
         }
 
-        let left = CGRectMake(tab.frame.minX, 1, 1, 1)
-        let right = CGRectMake(tab.frame.maxX - 1, 1, 1, 1)
-        self.scrollView.scrollRectToVisible(left, animated: true)
-        self.scrollView.scrollRectToVisible(right, animated: true)
+        delay(0.1) { // allow time for any layout code to complete
+            let left = CGRectMake(tab.frame.minX, 1, 1, 1)
+            let right = CGRectMake(tab.frame.maxX - 1, 1, 1, 1)
+            self.scrollView.scrollRectToVisible(left, animated: true)
+            self.scrollView.scrollRectToVisible(right, animated: true)
+        }
     }
 }
 
