@@ -137,10 +137,10 @@ class BraveURLBarView : URLBarView {
 
         stopReloadButton.imageEdgeInsets = UIEdgeInsetsMake(0, 6, 0, 0)
 
-        updateTabsBarOn(true)
+        updateTabsBarShowing()
     }
 
-    func updateTabsBarOn(duringStartup: Bool = false) {
+    func updateTabsBarShowing() {
         if (BraveApp.getPrefs()?.boolForKey(kPrefKeyTabsBarOn) ?? kPrefKeyTabsBarOnDefaultValue) {
             if tabsBarController.view.superview == nil {
                 addSubview(tabsBarController.view)
@@ -155,10 +155,8 @@ class BraveURLBarView : URLBarView {
             BraveURLBarView.CurrentHeight = UIConstants.ToolbarHeight
         }
 
-        if !duringStartup {
-            self.setupConstraints()
-            getApp().browserViewController.setupConstraints()
-        }
+        getApp().browserViewController.headerHeightConstraint?.updateOffset(BraveURLBarView.CurrentHeight)
+        getApp().browserViewController.webViewContainerTopOffset?.updateOffset(BraveURLBarView.CurrentHeight)
     }
 
     override func applyTheme(themeName: String) {

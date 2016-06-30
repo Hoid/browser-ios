@@ -38,7 +38,9 @@ class TabsBarViewController: UIViewController {
     }
 
     override func viewDidLayoutSubviews() {
-        updateContentSize(tabs.count)
+        delay(0.1) { // to ensure view.bounds is updated
+            self.updateContentSize(self.tabs.count)
+        }
     }
 
     func tabOverflowWidth(tabCount: Int) -> CGFloat {
@@ -48,7 +50,7 @@ class TabsBarViewController: UIViewController {
 
     func updateContentSize(tabCount: Int) {
         struct staticWidth { static var val = CGFloat(0) }
-        if staticWidth.val != view.bounds.width {
+        if abs(staticWidth.val - view.bounds.width) > 10 {
             let w = calcTabWidth(tabs.count)
             tabs.forEach {
                 $0.widthConstraint?.updateOffset(w)
@@ -109,7 +111,6 @@ class TabsBarViewController: UIViewController {
 
         let w = calcTabWidth(tabs.count + 1)
 
-        UIView.setAnimationsEnabled(true)
         UIView.animateWithDuration(0.2, animations: {
             self.tabs.forEach {
                 $0.widthConstraint?.updateOffset(w)
@@ -128,15 +129,14 @@ class TabsBarViewController: UIViewController {
             t.widthConstraint = make.width.equalTo(w).constraint
             make.height.equalTo(tabHeight)
 
-            if let prev = tabs.last {
+            if let prev = tabs.last where prev !== t {
                 make.left.equalTo(prev.snp_right)
             } else {
                 make.left.equalTo(t.superview!)
             }
-
-            tabs.append(t)
         }
 
+        tabs.append(t)
         updateContentSize(tabs.count)
         overflowIndicators()
 
@@ -144,39 +144,49 @@ class TabsBarViewController: UIViewController {
     }
 
     func calcTabWidth(tabCount: Int) -> CGFloat {
-        if tabCount < 1 {
-            return view.frame.width
+        func calc() -> CGFloat {
+            if tabCount < 2 {
+                return view.frame.width
+            }
+            var w = view.frame.width / (CGFloat(tabCount))
+            if w < minTabWidth {
+                w = minTabWidth
+            }
+            return w
         }
-        var w = view.frame.width / (CGFloat(tabCount))
-        if w < minTabWidth {
-            w = minTabWidth
-        }
-        return w
+        let c = calc()
+        return c > 0 ? c : UIScreen.mainScreen().bounds.width
     }
 
     func removeTab(tab: TabWidget) {
-        let w = calcTabWidth(tabs.count - 1)
-        var index = 0
+        guard let removedIndex = tabs.indexOf(tab) else { return }
 
+        tab.title.snp_removeConstraints()
+        tab.title.hidden = true
+
+        func at(i: Int) -> TabWidget? {
+            return 0 ..< self.tabs.count ~= i ? self.tabs[i] : nil
+        }
+
+        let prev = at(removedIndex - 1)
+        let next = at(removedIndex + 1)
+        tabs.removeAtIndex(removedIndex)
+
+        let w = calcTabWidth(tabs.count)
         UIView.animateWithDuration(0.2, animations: {
             tab.alpha = 0
-            for (i, item) in self.tabs.enumerate() {
-                if item === tab {
-                    index = i
-                    item.widthConstraint?.updateOffset(0)
-                } else {
-                    item.widthConstraint?.updateOffset(w)
-                }
+            tab.widthConstraint?.updateOffset(0)
+            self.tabs.forEach {
+                $0.widthConstraint?.updateOffset(w)
             }
             self.scrollView.layoutIfNeeded()
-            self.updateContentSize(self.tabs.count - 1)
         }) { _ in
-            func at(i: Int) -> TabWidget? {
-                return 0 ..< self.tabs.count ~= i ? self.tabs[i] : nil
+            if prev == nil && next == nil {
+                return
             }
 
-            let prev = at(index - 1)
-            let next = at(index + 1)
+            self.updateContentSize(self.tabs.count - 1)
+
             next?.snp_makeConstraints(closure: { (make) in
                 if let prev = prev {
                     make.left.equalTo(prev.snp_right)
@@ -186,7 +196,6 @@ class TabsBarViewController: UIViewController {
             })
 
             tab.removeFromSuperview()
-            self.tabs.removeAtIndex(index)
             self.overflowIndicators()
         }
     }

@@ -359,11 +359,13 @@ class BrowserViewController: UIViewController {
 #endif
     }
 
-    func setupConstraints() {
+    var headerHeightConstraint: Constraint?
+    var webViewContainerTopOffset: Constraint?
 
-        header.snp_remakeConstraints { make in
+    func setupConstraints() {
+        header.snp_makeConstraints { make in
             scrollController.headerTopConstraint = make.top.equalTo(snp_topLayoutGuideBottom).constraint
-            make.height.equalTo(BraveURLBarView.CurrentHeight)
+            headerHeightConstraint = make.height.equalTo(BraveURLBarView.CurrentHeight).constraint
 
             if UIDevice.currentDevice().userInterfaceIdiom == .Phone {
                 // iPad layout is customized in BraveTopViewController for showing panels

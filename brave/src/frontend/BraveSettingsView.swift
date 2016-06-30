@@ -56,7 +56,7 @@ class BraveSettingsView : AppSettingsTableViewController {
             ,BoolSetting(prefs: prefs, prefKey: kPrefKeyTabsBarOn, defaultValue: kPrefKeyTabsBarOnDefaultValue,
                 titleText: NSLocalizedString("Show Tabs Bar", comment: "Setting to show/hide the tabs bar"), statusText: nil,
                 settingDidChange: { value in
-                    (getApp().browserViewController.urlBar as! BraveURLBarView).updateTabsBarOn()
+                    (getApp().browserViewController.urlBar as? BraveURLBarView)?.updateTabsBarShowing()
             })
         ]
 

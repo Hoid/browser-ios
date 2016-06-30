@@ -16,7 +16,7 @@ class TabWidget : UIView {
 
     init(browser: Browser) {
         super.init(frame: CGRectZero)
-
+        self.translatesAutoresizingMaskIntoConstraints = false
         self.browser = browser
 
         getApp().browserViewController.delegates.append(WeakBrowserTabStateDelegate(value: self))
@@ -35,7 +35,6 @@ class TabWidget : UIView {
             make.width.equalTo(24)
         })
         close.tintColor = UIColor.lightGrayColor()
-
 
         title.snp_makeConstraints { (make) in
             make.top.bottom.equalTo(self)
